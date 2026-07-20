@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Product } from "@/lib/mock-data";
+import { Product } from "@/lib/types";
 
 export default function ProductCard({
   product,
