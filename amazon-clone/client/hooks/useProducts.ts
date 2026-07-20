@@ -1,20 +1,11 @@
 import { useApi } from "@/hooks/auth/useApi";
+import { Product } from "@/lib/types";
 
 type ProductsPayload = {
   category?: string;
   search?: string;
   page?: number;
   limit?: number;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  imageUrl: string;
-  category: string;
-  stock: number;
 };
 
 type ProductsResponse = {
