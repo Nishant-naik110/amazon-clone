@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const prisma = require("./db");
 const cors = require("cors");
+const { computeDeliveryEstimate } = require("./utils/delivery");
+const { PAYMENT_OPTIONS } = require("./config/paymentOptions");
 
 const app = express();
 app.use(cors());
@@ -129,6 +131,78 @@ app.post("/api/products/filter", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch products" });
+  }
+});
+
+app.post("/api/products/related", async (req, res) => {
+  try {
+    const { productId, category } = req.body;
+
+    if (!productId || !category) {
+      return res.status(400).json({ error: "productId and category are required" });
+    }
+
+    const relatedProducts = await prisma.product.findMany({
+      where: {
+        category,
+        id: { not: productId },
+      },
+      take: 8,
+      select: { id: true, name: true, price: true, imageUrl: true, category: true },
+    });
+
+    res.json({ products: relatedProducts });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch related products" });
+  }
+});
+
+app.post("/api/products/details", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "Product id is required" });
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        mrp: true,
+        imageUrl: true,
+        category: true,
+        stock: true,
+        rating: true,
+        reviewCount: true,
+        createdAt: true,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const price = Number(product.price);
+    const mrp = Number(product.mrp);
+    const discountPercent = mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0;
+    const emiPerMonth = Math.ceil(price / 12);
+
+    res.json({
+      ...product,
+      discountPercent,
+      inStock: product.stock > 0,
+      emiPerMonth,
+      deliveryEstimate: computeDeliveryEstimate(product.stock),
+      paymentOptions: PAYMENT_OPTIONS,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch product details" });
   }
 });
 

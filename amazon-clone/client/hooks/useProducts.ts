@@ -29,3 +29,36 @@ export const categoryProductsApi = (payload: ProductsPayload, enabled: boolean =
     }
   );
 };
+
+type ProductDetailsPayload = {
+  id: string;
+};
+
+export const productDetailsApi = (payload: ProductDetailsPayload, enabled: boolean = true) => {
+  return useApi<any>(
+    "/api/products/details",
+    "POST",
+    payload,
+    {
+      queryKey: ["productDetailsApi", payload.id],
+      enabled,
+    }
+  );
+};
+
+type RelatedProductsPayload = {
+  productId?: string;
+  category?: string;
+};
+
+export const relatedProductsApi = (payload: RelatedProductsPayload, enabled: boolean = true) => {
+  return useApi<{ products: Product[] }>(
+    "/api/products/related",
+    "POST",
+    payload,
+    {
+      queryKey: ["relatedProductsApi", payload.productId, payload.category],
+      enabled,
+    }
+  );
+};

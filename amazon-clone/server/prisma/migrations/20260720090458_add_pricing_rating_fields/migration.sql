@@ -1,0 +1,10 @@
+/*
+  Warnings:
+
+  - Added the required column `mrp` to the `Product` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "mrp" DECIMAL(10,2) NOT NULL,
+ADD COLUMN     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "reviewCount" INTEGER NOT NULL DEFAULT 0;

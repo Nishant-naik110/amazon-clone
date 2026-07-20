@@ -16,7 +16,7 @@ export default function ProductCard({
         </span>
       )}
 
-      <a href={`/products/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-gray-100">
+      <a href={`/product/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-gray-100">
         <Image
           src={product.imageUrl}
           alt={product.name}
@@ -26,7 +26,7 @@ export default function ProductCard({
       </a>
 
       <div className="flex flex-1 flex-col gap-1 p-3">
-        <a href={`/products/${product.id}`} className="line-clamp-2 text-sm font-medium hover:text-ink/70">
+        <a href={`/product/${product.id}`} className="line-clamp-2 text-sm font-medium hover:text-ink/70">
           {product.name}
         </a>
         <p className="text-xs text-gray-500">{product.category}</p>
