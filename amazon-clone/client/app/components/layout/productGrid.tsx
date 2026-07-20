@@ -1,4 +1,4 @@
-import { Product } from "@/lib/mock-data";
+import { Product } from "@/lib/types";
 import ProductCard from "./productCard";
 
 export default function ProductGrid({
