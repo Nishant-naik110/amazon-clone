@@ -19,12 +19,16 @@ type ProductsResponse = {
 };
 
 export const categoryProductsApi = (payload: ProductsPayload, enabled: boolean = true) => {
-  return useApi<ProductsResponse>(
-    "/api/products/filter",
+  return useApi<ProductsResponse>("/api/products/filter",
     "POST",
     payload,
     {
-      queryKey: ["categoryProductsApi", payload.category, payload.page, payload.limit],
+      queryKey: [
+        "categoryProductsApi",
+        payload.category,
+        payload.page,
+        payload.limit
+      ],
       enabled,
     }
   );
@@ -35,12 +39,14 @@ type ProductDetailsPayload = {
 };
 
 export const productDetailsApi = (payload: ProductDetailsPayload, enabled: boolean = true) => {
-  return useApi<any>(
-    "/api/products/details",
+  return useApi<any>("/api/products/details",
     "POST",
     payload,
     {
-      queryKey: ["productDetailsApi", payload.id],
+      queryKey: [
+        "productDetailsApi",
+        payload.id
+      ],
       enabled,
     }
   );
@@ -52,12 +58,15 @@ type RelatedProductsPayload = {
 };
 
 export const relatedProductsApi = (payload: RelatedProductsPayload, enabled: boolean = true) => {
-  return useApi<{ products: Product[] }>(
-    "/api/products/related",
+  return useApi<{ products: Product[] }>("/api/products/related",
     "POST",
     payload,
     {
-      queryKey: ["relatedProductsApi", payload.productId, payload.category],
+      queryKey: [
+        "relatedProductsApi",
+        payload.productId,
+        payload.category
+      ],
       enabled,
     }
   );
