@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { Product } from "@/lib/types";
+import { useAddToCart } from "@/app/cart/useAddToCart";
 
-export default function ProductCard({
-  product,
-  onAddToCart,
-}: {
-  product: Product;
-  onAddToCart: (id: string) => void;
-}) {
+export default function ProductCard({ product }: { product: Product }) {
+  const addToCart = useAddToCart();
+
+  const handleAddToCart = () => {
+    addToCart.mutate({ productId: product.id, quantity: 1 });
+  };
+
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
       {product.trending && (
@@ -15,7 +16,6 @@ export default function ProductCard({
           Trending
         </span>
       )}
-
       <a href={`/product/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-gray-100">
         <Image
           src={product.imageUrl}
@@ -24,7 +24,6 @@ export default function ProductCard({
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </a>
-
       <div className="flex flex-1 flex-col gap-1 p-3">
         <a href={`/product/${product.id}`} className="line-clamp-2 text-sm font-medium hover:text-ink/70">
           {product.name}
@@ -33,10 +32,11 @@ export default function ProductCard({
         <div className="mt-auto flex items-center justify-between pt-2">
           <span className="font-display text-lg font-bold text-ink">${product.price}</span>
           <button
-            onClick={() => onAddToCart(product.id)}
-            className="rounded-full bg-amber px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-amber/90"
+            onClick={handleAddToCart}
+            disabled={addToCart.isPending}
+            className="rounded-full bg-amber px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-amber/90 disabled:opacity-50"
           >
-            Add to cart
+            {addToCart.isPending ? "Adding..." : "Add to cart"}
           </button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Navbar from "@/app/components/layout/navbar";
 import { productDetailsApi, relatedProductsApi } from "@/hooks/useProducts";
 import { FAKE_REVIEWS } from "@/lib/fake-reviews";
+import { useAddToCart } from "@/app/cart/useAddToCart";
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
@@ -19,9 +20,11 @@ export default function ProductDetailPage() {
     !!product?.category
   );
 
-  const handleAddToCart = () => {
-    console.log("add to cart:", productId);
-  };
+const addToCart = useAddToCart();
+
+const handleAddToCart = () => {
+  addToCart.mutate({ productId, quantity: 1 });
+};
 
   if (productLoading) {
     return (
@@ -81,13 +84,13 @@ export default function ProductDetailPage() {
               {product.inStock ? "In stock" : "Out of stock"}
             </p>
 
-            <button
-              onClick={handleAddToCart}
-              disabled={!product.inStock}
-              className="mt-4 w-full rounded-full bg-amber py-2 text-sm font-semibold text-ink hover:bg-amber/90 disabled:opacity-50"
-            >
-              Add to cart
-            </button>
+           <button
+  onClick={handleAddToCart}
+  disabled={!product.inStock || addToCart.isPending}
+  className="mt-4 w-full rounded-full bg-amber py-2 text-sm font-semibold text-ink hover:bg-amber/90 disabled:opacity-50"
+>
+  {addToCart.isPending ? "Adding..." : "Add to cart"}
+</button>
 
             <div className="mt-4 border-t border-black/5 pt-4">
               <p className="text-xs font-semibold text-gray-500">Payment options</p>

@@ -39,7 +39,7 @@ app.post("/api/auth/register", async (req, res) => {
     // Immediately log them in after registering by issuing a token
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email } });
+    res.status(201).json({ token,message:"User created successfully!!!!!!!", user: { id: user.id, name: user.name, email: user.email } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong." });
@@ -203,6 +203,85 @@ app.post("/api/products/details", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch product details" });
+  }
+});
+
+
+const { requireAuth } = require("./middleware/auth");
+
+// Add item to cart (or increment quantity if already there)
+app.post("/api/cart/add", requireAuth, async (req, res) => {
+  try {
+    const { productId, quantity = 1 } = req.body;
+    const userId = req.userId; // set by requireAuth middleware
+
+    if (!productId) {
+      return res.status(400).json({ error: "productId is required" });
+    }
+
+    const cartItem = await prisma.cartItem.upsert({
+      where: { userId_productId: { userId, productId } },
+      update: { quantity: { increment: quantity } },
+      create: { userId, productId, quantity },
+    });
+
+    res.json(cartItem);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to add to cart" });
+  }
+});
+
+// Get the logged-in user's full cart
+app.get("/api/cart", requireAuth, async (req, res) => {
+  try {
+    const cartItems = await prisma.cartItem.findMany({
+      where: { userId: req.userId },
+      include: { product: true }, // pull full product details for each cart line
+    });
+
+    res.json({ cartItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch cart" });
+  }
+});
+
+// Update quantity of a specific cart item
+app.patch("/api/cart/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({ error: "quantity must be at least 1" });
+    }
+
+    const cartItem = await prisma.cartItem.update({
+      where: { id, userId: req.userId }, // userId check prevents editing someone else's cart
+      data: { quantity },
+    });
+
+    res.json(cartItem);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update cart item" });
+  }
+});
+
+// Remove item from cart
+app.delete("/api/cart/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.cartItem.delete({
+      where: { id, userId: req.userId },
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to remove cart item" });
   }
 });
 
