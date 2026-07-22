@@ -24,10 +24,6 @@ export default function HomePage() {
     }
   }, [isLoading, user, router]);
 
-  const handleAddToCart = (id: string) => {
-    console.log("add to cart:", id);
-  };
-
   if (isLoading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-paper">
@@ -45,7 +41,7 @@ export default function HomePage() {
         {productsLoading ? (
           <p className="py-16 text-center text-sm text-gray-500">Loading products...</p>
         ) : (
-          <ProductGrid products={productsData?.products ?? []} onAddToCart={handleAddToCart} />
+          <ProductGrid products={productsData?.products ?? []} />
         )}
       </main>
     </>

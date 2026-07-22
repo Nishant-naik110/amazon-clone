@@ -14,10 +14,6 @@ export default function CategoryPage() {
 
   const { data: productsData, isLoading } = categoryProductsApi({ category, page, limit: 20 });
 
-  const handleAddToCart = (id: string) => {
-    console.log("add to cart:", id);
-  };
-
   return (
     <>
       <Navbar />
@@ -27,7 +23,7 @@ export default function CategoryPage() {
         {isLoading ? (
           <p className="py-16 text-center text-sm text-gray-500">Loading products...</p>
         ) : (
-          <ProductGrid products={productsData?.products ?? []} onAddToCart={handleAddToCart} />
+          <ProductGrid products={productsData?.products ?? []} />
         )}
 
         {/* Pagination */}
